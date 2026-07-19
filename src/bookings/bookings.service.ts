@@ -49,13 +49,17 @@ export class BookingsService {
     });
 
     if (this.notificationsService) {
-      await this.notificationsService.create({
-        userId: agentId,
-        title: 'New inspection booking',
-        body: `Someone booked an inspection for ${listing.title}`,
-        type: 'booking_created',
-        data: { bookingId: booking.id, listingId: listing.id },
-      });
+      try {
+        await this.notificationsService.create({
+          userId: agentId,
+          title: 'New inspection booking',
+          body: `Someone booked an inspection for ${listing.title}`,
+          type: 'booking_created',
+          data: { bookingId: booking.id, listingId: listing.id },
+        });
+      } catch {
+        // Booking should succeed even if notification delivery fails
+      }
     }
 
     return booking;

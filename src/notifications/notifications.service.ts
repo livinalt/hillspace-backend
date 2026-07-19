@@ -28,8 +28,9 @@ export class NotificationsService {
   }
 
   async list(userId: string) {
+    const user = new Types.ObjectId(userId);
     return this.notificationModel
-      .find({ user: new Types.ObjectId(userId) })
+      .find({ user })
       .sort({ createdAt: -1 })
       .limit(100);
   }

@@ -355,13 +355,14 @@ async function main() {
       }
 
       try {
-        const thread = await req('GET', `/api/messages/conversations/${conversationId}`, {
-          token: buyerToken,
-          expect: 200,
-        });
-        const msgs = thread.data?.messages;
-        if (Array.isArray(msgs) && msgs.length >= 1) ok('messages get thread', `msgs=${msgs.length}`);
-        else fail('messages get thread', JSON.stringify(thread.data).slice(0, 200));
+      const thread = await req('GET', `/api/messages/conversations/${conversationId}`, {
+        token: buyerToken,
+        expect: 200,
+      });
+      const msgs = thread.data?.messages ?? thread.data;
+      const n = Array.isArray(msgs) ? msgs.length : 0;
+      if (n >= 1) ok('messages get thread', `msgs=${n}`);
+      else fail('messages get thread', `msgs=${n} raw=${JSON.stringify(thread.data).slice(0, 180)}`);
       } catch (e) {
         fail('messages get thread', e.message);
       }
