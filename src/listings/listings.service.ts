@@ -113,8 +113,9 @@ export class ListingsService {
   }
 
   async myListings(ownerId: string, status?: ListingStatus) {
+    const owner = new Types.ObjectId(ownerId);
     const filter: Record<string, unknown> = {
-      $or: [{ owner: ownerId }, { agent: ownerId }],
+      $or: [{ owner }, { agent: owner }],
     };
     if (status) filter.status = status;
     return this.listingModel.find(filter).sort({ updatedAt: -1 });
@@ -211,11 +212,10 @@ export class ListingsService {
 
   async addFavorite(userId: string, listingId: string) {
     await this.findById(listingId);
+    const user = new Types.ObjectId(userId);
+    const listing = new Types.ObjectId(listingId);
     try {
-      return await this.favoriteModel.create({
-        user: new Types.ObjectId(userId),
-        listing: new Types.ObjectId(listingId),
-      });
+      return await this.favoriteModel.create({ user, listing });
     } catch {
       throw new ConflictException('Listing already favorited');
     }
@@ -223,8 +223,8 @@ export class ListingsService {
 
   async removeFavorite(userId: string, listingId: string) {
     const result = await this.favoriteModel.findOneAndDelete({
-      user: userId,
-      listing: listingId,
+      user: new Types.ObjectId(userId),
+      listing: new Types.ObjectId(listingId),
     });
     if (!result) {
       throw new NotFoundException('Favorite not found');
@@ -234,7 +234,7 @@ export class ListingsService {
 
   async myFavorites(userId: string) {
     return this.favoriteModel
-      .find({ user: userId })
+      .find({ user: new Types.ObjectId(userId) })
       .populate({
         path: 'listing',
         populate: [
@@ -257,19 +257,19 @@ export class ListingsService {
       throw new BadRequestException('You cannot rate your own listing');
     }
 
+    const user = new Types.ObjectId(userId);
+    const listingRef = new Types.ObjectId(listingId);
+
     const rating = await this.ratingModel.findOneAndUpdate(
-      {
-        user: new Types.ObjectId(userId),
-        listing: new Types.ObjectId(listingId),
-      },
+      { user, listing: listingRef },
       {
         $set: {
           stars: dto.stars,
           ...(dto.comment !== undefined ? { comment: dto.comment } : {}),
         },
         $setOnInsert: {
-          user: new Types.ObjectId(userId),
-          listing: new Types.ObjectId(listingId),
+          user,
+          listing: listingRef,
         },
       },
       { upsert: true, new: true, runValidators: true },
@@ -282,8 +282,8 @@ export class ListingsService {
   async getMyRating(userId: string, listingId: string) {
     await this.findById(listingId);
     const rating = await this.ratingModel.findOne({
-      user: userId,
-      listing: listingId,
+      user: new Types.ObjectId(userId),
+      listing: new Types.ObjectId(listingId),
     });
     if (!rating) {
       throw new NotFoundException('You have not rated this listing');
@@ -294,15 +294,15 @@ export class ListingsService {
   async listRatings(listingId: string) {
     await this.findById(listingId);
     return this.ratingModel
-      .find({ listing: listingId })
+      .find({ listing: new Types.ObjectId(listingId) })
       .populate('user', 'firstName lastName avatarUrl')
       .sort({ updatedAt: -1 });
   }
 
   async deleteMyRating(userId: string, listingId: string) {
     const result = await this.ratingModel.findOneAndDelete({
-      user: userId,
-      listing: listingId,
+      user: new Types.ObjectId(userId),
+      listing: new Types.ObjectId(listingId),
     });
     if (!result) {
       throw new NotFoundException('Rating not found');

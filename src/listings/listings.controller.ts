@@ -116,12 +116,6 @@ export class ListingsController {
     return this.listingsService.myFavorites(userId);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get listing by id' })
-  findOne(@Param('id') id: string) {
-    return this.listingsService.findById(id);
-  }
-
   @Get(':id/ratings')
   @ApiOperation({
     summary: 'List ratings for a listing',
@@ -144,6 +138,12 @@ export class ListingsController {
     @CurrentUser('sub') userId: string,
   ) {
     return this.listingsService.getMyRating(userId, id);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get listing by id' })
+  findOne(@Param('id') id: string) {
+    return this.listingsService.findById(id);
   }
 
   @Post()
