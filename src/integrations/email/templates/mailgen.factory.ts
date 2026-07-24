@@ -13,7 +13,7 @@ export function getMailgen(): Mailgen {
       name: 'HillSpace',
       link: process.env.FRONTEND_URL || 'http://localhost:3000',
       ...(logoUrl ? { logo: logoUrl, logoHeight: '140px' } : {}),
-      copyright: 'HillSpace — Real Estate Marketplace',
+      copyright: 'HillSpace - Real Estate Marketplace',
     },
   });
 }

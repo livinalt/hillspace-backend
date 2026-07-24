@@ -39,8 +39,11 @@ export async function sendViaGmailApi(
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
   const b64 = (s: string) => Buffer.from(s, 'utf-8').toString('base64');
-  // RFC 2047 — keeps non-ASCII subjects (e.g. em dashes) from becoming mojibake in Gmail
-  const encodedSubject = `=?UTF-8?B?${b64(options.subject)}?=`;
+  // Keep subjects ASCII-only so Gmail never shows mojibake (Ã¢Â€Â”, etc.)
+  const safeSubject = options.subject
+    .replace(/[\u2010-\u2015\u2212]/g, '-') // dashes
+    .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '');
+  const encodedSubject = `=?UTF-8?B?${b64(safeSubject)}?=`;
 
   let rawMessage: string;
 

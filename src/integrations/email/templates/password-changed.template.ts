@@ -11,7 +11,7 @@ export function buildPasswordChangedEmail(name: string) {
         'If you made this change, no further action is needed.',
         'If you did not change your password, contact support immediately and secure your account.',
       ],
-      outro: 'Stay safe — never share your password with anyone.',
+      outro: 'Stay safe - never share your password with anyone.',
     },
   };
 

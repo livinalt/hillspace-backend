@@ -10,7 +10,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -19,6 +18,7 @@ import {
 import type { Request, Response } from 'express';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { getPublicFrontendBaseUrl } from '../integrations/email/templates/email-urls';
 import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
@@ -32,10 +32,7 @@ import { VerifyResetOtpDto } from './dto/verify-reset-otp.dto';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user (sends verification OTP email)' })
@@ -120,17 +117,12 @@ export class AuthController {
     @Query('token') token: string,
     @Res() res: Response,
   ) {
-    const frontendUrl =
-      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    const frontendUrl = getPublicFrontendBaseUrl();
     try {
       await this.authService.cancelSignup(uid, token);
-      return res.redirect(
-        `${frontendUrl.replace(/\/$/, '')}/auth/signup?accountDeleted=1`,
-      );
+      return res.redirect(`${frontendUrl}/auth/signup?accountDeleted=1`);
     } catch {
-      return res.redirect(
-        `${frontendUrl.replace(/\/$/, '')}/auth/signup?cancelFailed=1`,
-      );
+      return res.redirect(`${frontendUrl}/auth/signup?cancelFailed=1`);
     }
   }
 }

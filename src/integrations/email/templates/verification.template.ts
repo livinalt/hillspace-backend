@@ -1,4 +1,5 @@
 import { getMailgen } from './mailgen.factory';
+import { getPublicApiBaseUrl, getPublicFrontendBaseUrl } from './email-urls';
 
 export type VerificationVariant = 'signup' | 'repeat';
 
@@ -9,20 +10,20 @@ export function buildVerificationEmail(
   userId?: string,
 ) {
   const mailgen = getMailgen();
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  const apiUrl =
-    process.env.BACKEND_URL ||
-    process.env.API_URL ||
-    'http://localhost:3000';
+  const baseUrl = getPublicFrontendBaseUrl();
+  const apiUrl = getPublicApiBaseUrl();
 
-  const verifyLink = `${baseUrl.replace(/\/$/, '')}/auth/verify-email`;
+  const verifyLink = `${baseUrl}/auth/verify-email`;
   const cancelLink = userId
-    ? `${apiUrl.replace(/\/$/, '')}/auth/cancel-signup?${new URLSearchParams({ uid: userId, token: otp }).toString()}`
+    ? `${apiUrl}/auth/cancel-signup?${new URLSearchParams({
+        uid: userId,
+        token: otp,
+      }).toString()}`
     : null;
 
   const intro =
     variant === 'signup'
-      ? 'Welcome to HillSpace — your account is almost ready.'
+      ? 'Welcome to HillSpace - your account is almost ready.'
       : 'You requested a new verification code for your HillSpace account.';
 
   const actions = [
