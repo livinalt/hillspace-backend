@@ -1,4 +1,4 @@
-export { getMailgen } from './mailgen.factory';
+export { getMailgen, renderMail } from './mailgen.factory';
 export {
   buildVerificationEmail,
   type VerificationVariant,

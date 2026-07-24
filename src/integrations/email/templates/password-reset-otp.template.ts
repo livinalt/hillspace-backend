@@ -1,8 +1,7 @@
-import { getMailgen } from './mailgen.factory';
+import { renderMail } from './mailgen.factory';
 
-/** Forgot password — 4-digit OTP (Figma reset flow). */
+/** Forgot password - 4-digit OTP (Figma reset flow). */
 export function buildPasswordResetOtpEmail(name: string, otp: string) {
-  const mailgen = getMailgen();
   const email = {
     body: {
       name,
@@ -18,7 +17,6 @@ export function buildPasswordResetOtpEmail(name: string, otp: string) {
 
   return {
     subject: 'HillSpace - Password reset code',
-    html: mailgen.generate(email),
-    text: mailgen.generatePlaintext(email),
+    ...renderMail(email),
   };
 }

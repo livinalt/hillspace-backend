@@ -1,4 +1,4 @@
-import { getMailgen } from './mailgen.factory';
+import { renderMail } from './mailgen.factory';
 
 export type LoginNotificationParams = {
   /** ISO 8601 instant when login succeeded (server time). */
@@ -12,7 +12,6 @@ export function buildLoginNotificationEmail(
   name: string,
   params: LoginNotificationParams,
 ) {
-  const mailgen = getMailgen();
   const when = new Date(params.loggedInAtIso);
   const displayUtc = when.toLocaleString(undefined, {
     dateStyle: 'full',
@@ -44,7 +43,6 @@ export function buildLoginNotificationEmail(
 
   return {
     subject: 'HillSpace - New sign-in to your account',
-    html: mailgen.generate(email),
-    text: mailgen.generatePlaintext(email),
+    ...renderMail(email),
   };
 }

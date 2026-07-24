@@ -1,8 +1,7 @@
-import { getMailgen } from './mailgen.factory';
+import { renderMail } from './mailgen.factory';
 
 /** Sent after successful password reset (security notice). */
 export function buildPasswordChangedEmail(name: string) {
-  const mailgen = getMailgen();
   const email = {
     body: {
       name,
@@ -17,7 +16,6 @@ export function buildPasswordChangedEmail(name: string) {
 
   return {
     subject: 'HillSpace - Your password was changed',
-    html: mailgen.generate(email),
-    text: mailgen.generatePlaintext(email),
+    ...renderMail(email),
   };
 }

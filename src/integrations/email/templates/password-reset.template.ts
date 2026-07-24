@@ -1,7 +1,8 @@
-import { getMailgen } from './mailgen.factory';
+import { renderMail } from './mailgen.factory';
+import { getPublicFrontendBaseUrl } from './email-urls';
 
 /**
- * Forgot password — link includes user id + opaque `reset` (stored as `resetUrlToken` on the user).
+ * Forgot password - link includes user id + opaque `reset` (stored as `resetUrlToken` on the user).
  * Legacy `?token=` still works via API if old emails are in the wild.
  */
 export function buildPasswordResetEmail(
@@ -9,13 +10,12 @@ export function buildPasswordResetEmail(
   userId: string,
   resetUrlToken: string,
 ) {
-  const mailgen = getMailgen();
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const baseUrl = getPublicFrontendBaseUrl();
   const q = new URLSearchParams({
     uid: userId,
     reset: resetUrlToken,
   });
-  const resetLink = `${baseUrl.replace(/\/$/, '')}/reset-password?${q.toString()}`;
+  const resetLink = `${baseUrl}/reset-password?${q.toString()}`;
 
   const email = {
     body: {
@@ -38,7 +38,6 @@ export function buildPasswordResetEmail(
 
   return {
     subject: 'HillSpace - Reset your password',
-    html: mailgen.generate(email),
-    text: mailgen.generatePlaintext(email),
+    ...renderMail(email),
   };
 }

@@ -1,4 +1,4 @@
-import { getMailgen } from './mailgen.factory';
+import { renderMail } from './mailgen.factory';
 import { getPublicApiBaseUrl, getPublicFrontendBaseUrl } from './email-urls';
 
 export type VerificationVariant = 'signup' | 'repeat';
@@ -9,7 +9,6 @@ export function buildVerificationEmail(
   variant: VerificationVariant = 'repeat',
   userId?: string,
 ) {
-  const mailgen = getMailgen();
   const baseUrl = getPublicFrontendBaseUrl();
   const apiUrl = getPublicApiBaseUrl();
 
@@ -65,7 +64,6 @@ export function buildVerificationEmail(
 
   return {
     subject: 'HillSpace - Verify your email',
-    html: mailgen.generate(email),
-    text: mailgen.generatePlaintext(email),
+    ...renderMail(email),
   };
 }
